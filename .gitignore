@@ -1,0 +1,22 @@
+# Local environment secrets.
+.env
+.env.*
+!.env.example
+.envrc
+
+# Credentials and private keys.
+/secrets/
+/credentials/
+client_secret*.json
+credentials.json
+token.json
+tokens.json
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Private runtime data, test data, and local research notes.
+/.local/
+/private-test-data/
+/.audit/

@@ -8,6 +8,10 @@
 
 第一輪成果可先看 [13 個框架比較](docs/framework-comparison.md)，再看 [LINE API 限制](docs/line-api-research.md)、[Google 授權](docs/google-integration-research.md)、[需求與驗收](docs/requirements-and-acceptance.md) 及 [雲端部署](docs/cloud-deployment-research.md)。目前完成文件研究，原型與實際 API 驗證尚未執行。
 
+Google 個人帳號與 Workspace 都納入研究、選型與支援規劃。本輪先用個人帳號實測；Workspace 因目前無法提供測試環境，保留相容性研究與後續實測項目，不以個人帳號結果宣稱 Workspace 已驗證。
+
+實際串接前請依 [LINE 與 Google 測試環境設定](docs/test-environment-setup.md) 準備帳號、雲端網址與憑證。公開 repo 只保存 [空白設定範本](.env.example)；實際密鑰與私人資料依 `.gitignore` 排除，雲端改由秘密管理服務提供。
+
 ## pstack 技能
 
 此 repo 的 `.agents/skills/` 已安裝 pstack，採用支援 Codex 的 [pstack 社群移植版](https://github.com/michael-denyer/pstack-claude)，原始專案為 Cursor 收錄的 [pstack](https://github.com/cursor/plugins/tree/main/pstack)。
