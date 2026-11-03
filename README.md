@@ -6,6 +6,8 @@
 
 [框架與雲端部署研究計畫](docs/research-plan.md) 記錄法務助理需求、全部 13 個評估選項、雲端部署限制、研究步驟與目前進度。
 
+第一輪成果可先看 [13 個框架比較](docs/framework-comparison.md)，再看 [LINE API 限制](docs/line-api-research.md)、[Google 授權](docs/google-integration-research.md)、[需求與驗收](docs/requirements-and-acceptance.md) 及 [雲端部署](docs/cloud-deployment-research.md)。目前完成文件研究，原型與實際 API 驗證尚未執行。
+
 ## pstack 技能
 
 此 repo 的 `.agents/skills/` 已安裝 pstack，採用支援 Codex 的 [pstack 社群移植版](https://github.com/michael-denyer/pstack-claude)，原始專案為 Cursor 收錄的 [pstack](https://github.com/cursor/plugins/tree/main/pstack)。
