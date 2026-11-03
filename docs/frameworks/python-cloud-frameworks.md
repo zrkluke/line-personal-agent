@@ -103,7 +103,7 @@ Google 整合可用自訂 REST 工具或 MCP；本輪沒有確認 SDK 內建完�
 
 ## 三者共同剩餘的 Google 與可靠性工作
 
-三者都必須完成 [Google 整合研究](../google-integration-research.md) 的帳號、scopes、同意畫面、權杖保存與更新、撤銷處理及政策確認。個人 Gmail 與 Workspace 要各測一次。模型 API key、Google Cloud IAM 及律師的 Gmail OAuth 是不同憑證，不能互相取代。
+三者都必須完成 [Google 整合研究](../google-integration-research.md) 的帳號、scopes、同意畫面、權杖保存與更新、撤銷處理及政策確認。個人帳號與 Workspace 都在支援規劃範圍。本輪先實測個人帳號；Workspace 因缺乏環境延後實測，其相容性、管理員政策與整合方式仍須納入選型，保留後續驗收。模型 API key、Google Cloud IAM 及律師的 Gmail OAuth 是不同憑證，不能互相取代。
 
 Drive 要測實際 folder ID、既有資料可見範圍與客戶受控開啟附件。Gmail 要測同步游標、附件、時區與已讀信不漏處理。Calendar 要測指定行事曆、確認版本及重複建立防護。框架已有 API wrapper 或 MCP，只能減少接線，不會替這些驗收作保證。
 
