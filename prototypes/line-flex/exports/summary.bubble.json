@@ -1,0 +1,129 @@
+{
+  "type": "bubble",
+  "size": "mega",
+  "body": {
+    "type": "box",
+    "layout": "vertical",
+    "spacing": "md",
+    "contents": [
+      {
+        "type": "text",
+        "text": "合成資料・僅模擬歸檔",
+        "wrap": true,
+        "size": "xs",
+        "color": "#666666"
+      },
+      {
+        "type": "text",
+        "text": "待處理 3 件",
+        "wrap": true,
+        "size": "lg",
+        "weight": "bold",
+        "color": "#087F46"
+      },
+      {
+        "type": "box",
+        "layout": "vertical",
+        "spacing": "xs",
+        "paddingAll": "md",
+        "backgroundColor": "#F0F7F2",
+        "contents": [
+          {
+            "type": "text",
+            "text": "範例客戶甲｜侵權行為",
+            "wrap": true,
+            "size": "sm",
+            "weight": "bold"
+          },
+          {
+            "type": "text",
+            "text": "補充資料.pdf",
+            "wrap": true,
+            "size": "xs"
+          },
+          {
+            "type": "button",
+            "style": "secondary",
+            "height": "sm",
+            "action": {
+              "type": "postback",
+              "label": "處理這筆附件",
+              "data": "synthetic_action_0000000000000001"
+            }
+          }
+        ]
+      },
+      {
+        "type": "box",
+        "layout": "vertical",
+        "spacing": "xs",
+        "paddingAll": "md",
+        "backgroundColor": "#F0F7F2",
+        "contents": [
+          {
+            "type": "text",
+            "text": "範例客戶甲｜返還借款",
+            "wrap": true,
+            "size": "sm",
+            "weight": "bold"
+          },
+          {
+            "type": "text",
+            "text": "範例客戶甲_返還借款案件_付款紀錄與對帳明細.pdf",
+            "wrap": true,
+            "size": "xs"
+          },
+          {
+            "type": "button",
+            "style": "secondary",
+            "height": "sm",
+            "action": {
+              "type": "postback",
+              "label": "處理這筆附件",
+              "data": "synthetic_action_0000000000000002"
+            }
+          }
+        ]
+      },
+      {
+        "type": "box",
+        "layout": "vertical",
+        "spacing": "xs",
+        "paddingAll": "md",
+        "backgroundColor": "#F0F7F2",
+        "contents": [
+          {
+            "type": "text",
+            "text": "範例客戶乙｜租賃爭議",
+            "wrap": true,
+            "size": "sm",
+            "weight": "bold"
+          },
+          {
+            "type": "text",
+            "text": "租賃契約補件.pdf",
+            "wrap": true,
+            "size": "xs"
+          },
+          {
+            "type": "button",
+            "style": "secondary",
+            "height": "sm",
+            "action": {
+              "type": "postback",
+              "label": "處理這筆附件",
+              "data": "synthetic_action_0000000000000003"
+            }
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "text": "已完成 0 件",
+        "wrap": true,
+        "size": "xs",
+        "color": "#666666"
+      }
+    ]
+  }
+}
