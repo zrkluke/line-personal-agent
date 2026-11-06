@@ -20,7 +20,7 @@ export function decide(state, command, now) {
   if (command.type === 'summary') return { view: 'summary' };
   const action = command.action;
   if (!action || action.owner !== command.actor) return { view: 'notice', text: '這個操作無法使用，請重新輸入「待處理」。' };
-  if (action.expiresAt <= now) return { view: 'notice', text: '這張卡片已過期。待辦仍保留，請重新輸入「待處理」。' };
+  if (action.expiresAt <= now) return { view: 'notice', text: '這張卡片已過期，請重新輸入「待處理」查詢最新狀態。' };
   if (action.verb === 'history' && action.taskId === null) return { view: 'history' };
   if (!taskVerbs.has(action.verb)) return { view: 'notice', text: '這個操作無法使用，請重新輸入「待處理」。' };
   const task = state.tasks.find(item => item.id === action.taskId);

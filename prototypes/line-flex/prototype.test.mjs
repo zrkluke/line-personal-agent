@@ -168,6 +168,23 @@ test('卡片到期不刪除待辦，重新查詢產生可用操作', async t => 
   assert.equal(pending(h.store), 2);
 });
 
+test('已完成附件在卡片過期後提示查詢最新狀態，歸檔結果不變', async t => {
+  const h = await harness(t, { ttl: 1000 });
+  const first = await h.deliver(h.event());
+  const confirm = firstAction(first.messages, '確認模擬歸檔');
+  await h.deliver(h.event(confirm));
+  assert.equal(pending(h.store), 2);
+  h.advance(1000);
+  const expired = await h.deliver(h.event(confirm));
+  assert.deepEqual(expired.messages, [{ type: 'text', text: '模擬測試\n這張卡片已過期，請重新輸入「待處理」查詢最新狀態。' }]);
+  assert.equal(pending(h.store), 2);
+  const refreshed = await h.deliver(h.event());
+  assert.match(asText(refreshed.messages), /待處理 2 件/);
+  const history = await h.deliver(h.event(firstAction(refreshed.messages, '查看完成紀錄')));
+  assert.match(asText(history.messages), /模擬完成紀錄 1 件/);
+  assert.match(asText(history.messages), /補充資料.pdf/);
+});
+
 test('相同 event 不重回覆；不同 event 重按完成確認可辨識，其他舊 action 拒絕', async t => {
   const h = await harness(t);
   const first = await h.deliver(h.event());
