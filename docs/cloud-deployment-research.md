@@ -1,20 +1,22 @@
 # 雲端部署的第一輪比較
 
-初輪查證日期：2026-11-03。Cloudflare 補充查證與部署選型原則更新日期：2026-11-06。狀態為官方文件研究，尚未部署、測量資源或建立付費服務。適用地區、帳號及價格需在候選驗證時固定。
+初輪查證日期：2026-11-03。Cloudflare 補充查證日期：2026-11-06。跨平台搬移研究與選型更新日期：2026-11-09。狀態為官方文件研究，尚未部署、測量資源或建立付費服務。適用地區、帳號及價格需在候選驗證時固定。
 
 部署可行性是框架縮選的必要條件。每個候選都要提出能接收 LINE 事件、執行背景工作、等待律師確認及恢復工作的完整雲端組合，並記錄實際部署步驟。只有框架功能比較或本機範例成功，還不足以決定採用。
 
+使用者於 2026-11-09 要求納入跨平台部署彈性。現在同時比較初次部署與未來搬移成本，第一個原型改先驗證通用容器、固定框架與 Postgres，在 Render 部署後搬到 Cloud Run。Cloudflare 保留對照，詳見 [搬移研究、成本與重新評估](deployment-portability-research.md)；同平台重新部署不算跨平台驗收。
+
 ## 三種部署方案比較摘要
 
-記錄日期為 2026-11-06。使用者希望優先選部署簡單的方案，目前先保存以下比較結果，尚未選定正式框架或部署平台。
+費用記錄日期為 2026-11-06，建議於 2026-11-09 更新。下表保留原架構的月費基準，不是新容器原型的報價，也不含搬移投入，尚未選定正式框架或部署平台。
 
-使用者已確認採「客戶擁有雲端帳號與帳單，再授權代管」。下表按此條件整理，Render 已加計 Pro 工作區費用。第一個原型暫推薦 Cloudflare，Cloud Run 保留為備案，尚未因此決定正式採用。
+使用者已確認採「客戶擁有雲端帳號與帳單，再授權代管」。下表按此條件整理，Render 已加計 Pro 工作區費用；搬移投入另見 [搬移成本](deployment-portability-research.md#各方案的搬移成本)。
 
 | 方案與框架 | 資料庫 | 平台月費估算 | 含模型、基本 OCR 與 LINE 的月費 | 部署難度與暫定建議 |
 | --- | --- | --- | --- | --- |
-| Cloudflare 加 Vercel AI SDK 與 Workflows | D1 | 約 NT$160。 | 約 NT$1,700。 | 第一個原型。API 工具、背景工作與等待確認可集中在同一平台，先驗證套件與資料保存。 |
-| Cloud Run 加 LangGraph、Cloud Tasks 與 Cloud Scheduler | 入門 Cloud SQL PostgreSQL | 約 NT$320 至 NT$480。 | 約 NT$1,900 至 NT$2,100。 | 備案。需要完整 Python、原生套件，或資料區域與網路條件更適合 GCP 時重比。 |
-| Render Pro 加 Pydantic AI | 託管 Postgres | 約 NT$1,520。 | 約 NT$3,100。 | 保留比較。一般 Python 程式部署較直接，但客戶與代管者共同管理需計入 Pro 費用，恢復與去重仍須實作。 |
+| Cloudflare 加 Vercel AI SDK 與 Workflows | D1 | 約 NT$160。 | 約 NT$1,700。 | 保留託管流程對照。需計入執行環境、D1 轉換與未完成工作的搬移成本，移出第一順位。 |
+| Cloud Run 加 LangGraph、Cloud Tasks 與 Cloud Scheduler | 入門 Cloud SQL PostgreSQL | 約 NT$320 至 NT$480。 | 約 NT$1,900 至 NT$2,100。 | 作容器原型的第二個平台；改為固定同一套 TypeScript 框架後仍需重估資源與用量。 |
+| Render Pro 加 Pydantic AI | 託管 Postgres | 約 NT$1,520。 | 約 NT$3,100。 | 保留原架構基準。新的首輪容器改驗證 LangGraph，不能直接沿用此配置與費用宣稱已足夠。 |
 
 相同情境假設為一位律師、五個案件群組、每組四位收件人，每天二十項任務、每月 1,200 次模型呼叫、三百頁基本 OCR，以及六百三十則 LINE 計費訊息。模型暫以 Claude Sonnet 5.5 作計價範例，文件使用既有 Drive 空間。金額均未含稅、刷卡費與開發維護人力，以 US$1 等於 NT$32 的假設換算，非即時匯率。
 
@@ -24,24 +26,24 @@ GCP 使用美國 Iowa `us-central1` 價格，並非臺灣區報價。最小共�
 
 ## 目前建議的第一個原型
 
-記錄日期為 2026-11-06。依「部署簡單」與「客戶自己付帳，再授權代管」兩項前提，暫推薦 TypeScript、Cloudflare Workers、Vercel AI SDK、Workflows 與 D1。這是下一輪驗證方向，不代表套件、真實 API 或故障恢復已通過，也不是正式採用決定。
+更新日期為 2026-11-09。加入跨平台搬移後，第一個原型改為 TypeScript、Node.js、LangGraph 核心套件、Postgres 與 Docker。先在 Render 建立完整流程，再以相同語言、框架與固定版本搬到 Cloud Run。這是研究判斷，尚未實作或正式採用。
 
 | 元件 | 第一個原型的分工 |
 | --- | --- |
-| Workers | 接收 LINE webhook、以原始 body 驗簽、持久保存事件，以及接收律師卡片確認。保存成功後才回應，派送中斷可恢復。 |
-| Vercel AI SDK | 作為模型與工具層，呼叫模型、整理結構化資料與執行明確的 Google 工具。部署在 Cloudflare，模型與供應商另行驗證。 |
-| Workflows | 管理背景步驟、重試及等待確認，是這個原型的主要流程恢復機制。外部操作另保存去重識別碼，不能只靠步驟重試避免重複操作。 |
-| D1 | 保存案件、律師與群組權限、待辦、操作與通知紀錄、來源版本、對話摘要及核准的長期記憶。案件資料與記憶可先放同一個資料庫，以不同資料表分工。 |
-| Cron | 定時啟動掃信、摘要及提醒，業務時間按 Asia/Taipei 處理。 |
-| Google Drive 與外部 OCR | 正式文件放 Drive，資料庫保存檔案 ID 與版本。基本 OCR 先使用外部 API，避免把重度文件處理塞進 Worker。 |
+| Node.js HTTP 入口 | 接收 LINE webhook、以原始 body 驗簽、持久保存事件，以及接收律師卡片確認。保存成功後才回應，派送中斷可補送。 |
+| LangGraph 核心套件 | 管理明確案件步驟、模型工具與等待確認；用 Postgres checkpointer 保存進度，不預設採用託管 Agent Server。 |
+| Postgres | 保存案件、權限、記憶、待確認與操作紀錄；框架 checkpoint 分開管理，固定版本後演練匯出與還原。 |
+| Docker 與部署設定 | 固定映像與啟動方式，在兩平台執行相同程式。平台 SDK 留在派送、排程與授權串接，不進案件規則。 |
+| 派送與排程 | Render 工作者與 Cron、Cloud Run 的 Cloud Tasks 與 Cloud Scheduler 分別串接同一個處理函式，驗證請求時限、停止及補送。業務時間按 Asia/Taipei 處理。 |
+| Google Drive 與外部 OCR | 正式文件放 Drive，資料庫保存檔案 ID 與版本。先使用外部 OCR，分開驗證文件存取與處理用量。 |
 
-本案目前沒有既有 Python 應用程式要搬遷，主要需求是 LINE、Google API、排程、案件資料與等待律師確認。先採 TypeScript 與 Cloudflare 的託管流程，可以集中部署設定，減少 Cloud Run 組合的容器、派送及 IAM 串接工作。這是依需求提出的設計判斷，實際工作量仍需原型確認。[Cloudflare AI SDK 整合](https://developers.cloudflare.com/agents/models/ai-sdk/)、[持久 Agent 流程](https://developers.cloudflare.com/workflows/get-started/durable-agents/)
+原本 Cloudflare 建議著重集中部署與減少維運設定；加入搬移條件後，需要一併衡量 Workflows 狀態交接與 D1 資料轉換。容器與 Postgres 也有派送、IAM、網路及版本相容工作，並非零成本。官方依據、差異與重新提高 Cloudflare 順位的條件見 [跨平台部署研究](deployment-portability-research.md)。
 
-每位客戶持有自己的 Cloudflare account、付款設定與最高管理權，邀請代管者加入。各客戶有自己的部署、D1、密鑰與 Google 授權，代管者用同一登入切換管理。初次設定時記錄資源、repo 與自動部署授權的歸屬，交接時確認撤銷代管權限後客戶仍能維護。詳細角色與費用見 [代管方式比較](#客戶持有帳號與帳單的代管方式)。
+每位客戶仍持有自己的雲端資源、付款設定、密鑰與 Google 授權，邀請代管者加入。初次設定時記錄資源、repo 與自動部署授權的歸屬，交接時確認撤銷代管權限後客戶仍能維護。詳細角色與原費用基準見 [代管方式比較](#客戶持有帳號與帳單的代管方式)。
 
-Cloud Run 備案採 LangGraph、Postgres、Cloud Tasks 與 Cloud Scheduler。若原型需要完整 Python 環境、原生工具或重度文件處理，先比較外部處理服務與 Cloud Run 容器的整體工作量。若客戶要求的資料區域或網路條件更適合 GCP，也提高此備案的順位，不為維持平台選擇而放寬需求。
+Cloud Run 現在是同一原型的搬移驗證目標，不能在搬移時改成 Python 或換框架後仍宣稱只是換平台。Python、Pydantic AI 與 Vercel AI SDK 路線繼續保留比較，若改選則另固定其版本並重跑相同案例。
 
-第一條驗證流程為「LINE 收文件、案件辨識、律師確認、Drive 歸檔、LINE 通知」。固定套件版本，使用合成案件測試 F01 重複事件、F02 外部成功後中斷、F09 等待確認時重啟與舊按鈕失效，再驗證客戶授權、資料保存與實際用量。這些驗證均尚未執行，通過後再決定正式框架與平台。
+第一條驗證流程仍為「LINE 收文件、案件辨識、律師確認、Drive 歸檔、LINE 通知」。除 F01、F02、F09 外，新增 [M01 至 M08 搬移驗收](requirements-and-acceptance.md#跨平台搬移驗收)，涵蓋程式、資料、未完成工作、排程、授權、切換與回復。這些驗證均尚未執行，通過後再決定正式框架與平台。
 
 ## 先固定需要長期保存的狀態
 
@@ -232,14 +234,15 @@ Cloud SQL 的共享 CPU 單價、儲存及備份依 [Cloud SQL 價格](https://c
 
 Cloud Run 的部署分工仍是入口、Cloud Tasks 派送背景請求、LangGraph checkpoint 接續、Cloud SQL 保存案件與操作、Cloud Scheduler 定時啟動。初次設定另需處理映像建置與儲存、執行服務帳號、派送呼叫權限、資料庫連線及密鑰。Google 使用者 OAuth 與雲端資源 IAM 是兩套不同授權，仍須分別設定。[Cloud Tasks 驗證](https://docs.cloud.google.com/tasks/docs/creating-http-target-tasks)、[Cloud Run 計費與生命週期](https://docs.cloud.google.com/run/docs/configuring/billing-settings)
 
-此處與 Render 的原比較使用單人工作區基準，Cloud Run 入門月費可能低約 NT$240 至 NT$400，但初次服務與權限設定較多。加入客戶持有帳號及授權代管的條件後，暫先驗證 Cloudflare，Cloud Run 作備案。若確定需要 GCP 資料區域、既有雲端權限治理，或已熟悉 GCP，再提高其優先順位。低量試用的 Cloud Run 入門組合含共用費用可先抓每月 NT$2,500 未稅，並追蹤資料庫是否需要升級。
+此處與 Render 的原比較使用單人工作區基準，Cloud Run 入門月費可能低約 NT$240 至 NT$400，但初次服務與權限設定較多。這是 2026-11-06 的估算；2026-11-09 加入搬移條件後，Cloud Run 改為同一容器原型的第二個平台，現行順序見 [目前建議](#目前建議的第一個原型)。原入門組合曾先抓每月 NT$2,500 未稅規劃額度，新原型仍需重新核對規格、用量與資料庫升級需求。
 
 ## 本輪候選部署方向
 
-以下組合沿用相同的 Google 工具、案件規則與驗收資料。目前先驗證 Cloudflare，Cloud Run 作備案，Render 保留比較。框架與平台相容性仍待實測，不是正式縮選結果。這些配對用來建立部署基準，不限制框架只能使用指定平台。差異可能來自部署環境時，再用同一框架更換平台核對。
+以下組合沿用相同的 Google 工具、案件規則與驗收資料。2026-11-09 調整為先用同一套 LangGraph 容器完成 Render 到 Cloud Run 搬移，其他組合作架構對照。框架與平台相容性仍待實測，不是正式縮選結果；不同框架的配對比較不能取代同一套程式的跨平台驗收。
 
 | 組合 | LINE 入口、Agent 與背景工作 | 保存、排程與主要恢復方式 | 原型先回答的問題 |
 | --- | --- | --- | --- |
+| 第一順位：同一容器在 Render 與 Cloud Run | TypeScript、Node.js 與 LangGraph 核心套件，平台派送只帶工作 ID，呼叫共用的案件處理函式。 | 兩端使用固定版本的 Postgres 與 checkpointer，先保持資料庫不變測運算，再搬到獨立資料庫。排程與派送分別串接。 | 同一套程式能否通過 R、F、M 驗收？實作、維運與搬移總成本是否可接受？ |
 | Cloudflare 加 TypeScript 工具層 | Workers 接收事件，Vercel AI SDK 呼叫模型與工具，Workflows 執行案件步驟。 | D1 或託管 Postgres 擇一保存案件與操作，Cron 啟動排程，Workflows 負責流程恢復。 | 固定套件版本後能否執行、等待確認並通過 F01、F02、F09？資料庫選擇與附件處理是否增加額外工作？ |
 | Cloud Run 加 LangGraph | 容器服務接收事件與執行 LangGraph，Cloud Tasks 派送有固定 ID 的分段工作。 | 託管 Postgres 保存案件與 checkpoint，Cloud Scheduler 啟動排程。LangGraph 管理流程進度，派送重試不得重複執行已完成操作。 | checkpoint、確認恢復與工作派送能否配合請求生命週期？入口與背景工作是否需分成兩個服務？ |
 | Render 付費服務加 Pydantic AI | Web Service 接收事件，Background Worker 執行案件工作與 Pydantic AI 工具。 | Postgres 保存案件、操作與工作表，Cron 啟動排程。工作者依持久業務狀態恢復，不將對話紀錄當成工作進度。 | 只用工作表與明確狀態能否可靠恢復？若需額外流程引擎，其收益是否足夠？ |
@@ -250,13 +253,14 @@ Google OAuth、Drive 正式文件、受控分享與 LINE Push 是各組合的共
 
 ## 以部署與維護簡單為優先的比較
 
-使用者於 2026-11-06 確認優先選部署簡單的方案。以下難易是對本案候選架構的文件研究判斷，沒有測量部署工時，也不代表平台本身有固定排名。
+使用者於 2026-11-06 確認優先選部署簡單的方案，2026-11-09 再加入跨平台搬移條件。以下順位已調整，需同時計入日常維護與離開平台的工作。難易是文件研究判斷，沒有測量部署或搬移工時，也不代表平台本身有固定排名。
 
 | 方案 | 初次部署與更新 | 需要自行處理的部分 | 本案暫定順位 |
 | --- | --- | --- | --- |
+| Render 加 Node.js、LangGraph 核心與 Postgres 容器 | 先建置固定映像、入口、工作者、資料庫與排程，再把同一程式部署到 Cloud Run。 | 持久派送、工作領取、案件操作紀錄與確認檢查，另驗證 checkpoint 搬移、停止舊端與回復。 | 第一個原型。首輪資源與記憶體尚未量測，月費待重估。 |
 | Render 加 Pydantic AI 與 Postgres | 同一 Git repo 設定 Web Service、Background Worker、Postgres 與 Cron，更新由平台建置部署。可用 Blueprint 集中描述服務與資料庫。 | 案件工作領取、逾時重試、等待確認與去重仍需持久狀態設計，平台啟動工作者不會自動補足。客戶與代管者共同管理另計 Pro 工作區費用。 | 保留比較。一般 Python 程式部署較直接，需一起衡量協作費與恢復程式。 |
-| Cloudflare 加 Vercel AI SDK、Workflows 與 D1 | 用 Wrangler 設定 Worker、資料庫、流程與排程的綁定，無需自行維護常駐工作者。 | 配合 Workers 執行方式、資料庫交易與套件相容性。Workflows 可代管步驟重試與等待，案件權限及外部操作去重仍需實作。 | 第一個原型。同時驗證部署、客戶授權代管、資料保存與故障恢復。 |
-| Cloud Run 加 LangGraph 與 Postgres | 設定容器服務、資料庫、Cloud Tasks、Cloud Scheduler 及服務間身分權限，再安排部署更新。 | 除案件與 checkpoint 外，需串起工作派送、請求生命週期、IAM 與資料庫連線。 | 備案。完整 Python、原生工具或 GCP 資料區域與網路條件成為必要時重比。 |
+| Cloudflare 加 Vercel AI SDK、Workflows 與 D1 | 用 Wrangler 設定 Worker、資料庫、流程與排程的綁定，無需自行維護常駐工作者。 | 配合 Workers 執行方式、資料庫交易與套件相容性。離開平台另需處理資料轉換與未完成流程交接。 | 保留對照。託管便利需與一次性搬移及後續維護成本一起比較。 |
+| Cloud Run 加相同 LangGraph 容器與 Postgres | 設定容器服務、資料庫、Cloud Tasks、Cloud Scheduler 及服務間身分權限，再安排部署更新。 | 除案件與 checkpoint 外，需串起工作派送、請求生命週期、IAM 與資料庫連線。 | 第一個原型的第二個平台。固定語言與框架，驗證程式、資料、工作及排程搬移。 |
 
 Render 的 [FastAPI 部署](https://render.com/docs/deploy-fastapi)、[Blueprint](https://render.com/docs/blueprint-spec)、[背景工作者](https://render.com/docs/background-workers) 與 [Postgres](https://render.com/docs/postgresql-creating-connecting) 文件支持上述資源配置。正式候選採付費服務，免費方案有休眠與其他限制，不作正式可靠性基準。[免費方案](https://render.com/docs/free)
 
@@ -286,11 +290,11 @@ LINE Agent 的律師與使用者角色仍由應用程式管理，雲端成員權
 
 代管建立流程先由客戶建立或確認資源持有人、付款與登入復原方式，再邀請代管者，以合成資料測試部署、權限與帳單可見範圍。程式 repo、部署設定及密鑰由誰持有也一併記錄。離開代管時撤銷個人與自動部署授權，確認服務仍可由客戶維護；這些動作均尚未實作或驗證。
 
-加入此需求後，暫推薦 Cloudflare 作第一個原型，Cloud Run 加 LangGraph 與 Postgres 作備案。Render 仍保留部署一般 Python 程式較直接的優點，但原本每月約 NT$2,300 的單人基準不適用於客戶加代管者共同管理，應改抓約 NT$3,100 起，記憶體升級另計。推薦理由與切換條件見 [目前建議](#目前建議的第一個原型)，正式採用仍待驗證。
+單就 2026-11-06 的客戶代管條件，當時暫推薦 Cloudflare。2026-11-09 加入搬移條件後，改先驗證容器與 Postgres，理由與重新提高 Cloudflare 順位的條件見 [搬移研究](deployment-portability-research.md)。Render 原本約 NT$2,300 的單人基準不適用於客戶與代管者共同管理；約 NT$3,100 的原配置基準也不含新原型可能的記憶體升級與搬移成本，不能直接當成新方案報價。
 
 ## 第一版的資料與記憶保存建議
 
-本案需要持久資料庫，因為案件關係、待辦、確認與外部操作在服務重啟後仍要保留。Cloudflare 原型暫用 D1，同一個資料庫以不同資料表分工，驗證交易、來源版本、操作去重與備份還原。若改採 Cloud Run 備案，則使用 Postgres。以下「主要資料庫」依候選指 D1 或 Postgres，第一版不另開記憶服務。
+本案需要持久資料庫，因為案件關係、待辦、確認與外部操作在服務重啟後仍要保留。2026-11-09 調整後，第一個容器原型使用 Postgres，以不同資料表管理案件與記憶，框架 checkpoint 另行管理；固定版本後演練兩平台間的備份還原與工作交接。Cloudflare 對照仍比較 D1 與外部 Postgres。以下「主要資料庫」依候選指 Postgres 或 D1，第一版不另開記憶服務。
 
 | 資料 | 暫定保存位置與方式 |
 | --- | --- |
@@ -319,5 +323,6 @@ LINE Agent 的律師與使用者角色仍由應用程式管理，雲端成員權
 | 無新訊息時啟動 | 排程仍能掃信與提醒，以 Asia/Taipei 計算時間，重複觸發、暫停後恢復及延遲工作依規則處理。 |
 | 文件與恢復維運 | 用代表性 PDF 與掃描件驗證大小、OCR、記憶體及逾時。演練資料還原與版本回復，從操作紀錄找得到未完成工作，紀錄不洩露權杖或案件正文。 |
 | 成本與資料位置 | 以相同使用量假設列出運算、資料庫、模型、OCR、LINE 與紀錄費用，確認各服務資料位置及保留期限，分開標示報價、估算與實測。 |
+| 跨平台搬移與回復 | 另在不同供應商完成相同程式、獨立資料庫、待確認與結果不明工作的搬移；停止舊端並演練新端寫入後回復，保存 [M01 至 M08](requirements-and-acceptance.md#跨平台搬移驗收) 與實際成本證據。 |
 
 目前以上部署驗證均未執行。框架可以先進入原型比較，但必要部署驗證尚未通過時，不能標示為正式採用或可上線。

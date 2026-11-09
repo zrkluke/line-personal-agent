@@ -10,7 +10,9 @@
 
 下一輪以「框架加完整部署組合」一起比較，納入 Cloudflare、Cloud Run 與 Render。每個候選都要說明 LINE 入口、背景工作、資料庫、排程、授權及恢復方式，正式採用前通過 [雲端部署驗證](docs/cloud-deployment-research.md#候選必須提出的部署證據)。目前尚未完成這些實測。
 
-[三種部署方案比較摘要](docs/cloud-deployment-research.md#三種部署方案比較摘要) 已記錄相同初期用量下的月費、部署難度與暫定建議。目前暫推薦 Cloudflare Workers、TypeScript、Vercel AI SDK、Workflows 與 D1 作第一個原型，Cloud Run 加 LangGraph 與 Postgres 作備案。[元件分工與切換條件](docs/cloud-deployment-research.md#目前建議的第一個原型) 已保存，尚未實作或正式定案。
+[三種部署方案比較摘要](docs/cloud-deployment-research.md#三種部署方案比較摘要) 保存 2026-11-06 的月費假設。2026-11-09 加入跨平台搬移條件後，第一個原型改先驗證 TypeScript、Node.js、LangGraph 核心套件、Postgres 與 Docker，在 Render 部署後搬到 Cloud Run；Cloudflare 保留對照。[元件分工](docs/cloud-deployment-research.md#目前建議的第一個原型) 尚未實作或正式定案，新原型需另估資源與月費。
+
+[跨平台部署與搬移成本研究](docs/deployment-portability-research.md) 說明重新評估的理由、各方案要改哪些部分、一次性投入與持續費用，以及切換和回復方式。[M01 至 M08 搬移驗收](docs/requirements-and-acceptance.md#跨平台搬移驗收) 包含同一套程式、資料、未完成任務、排程與授權的搬移，尚未實測。
 
 未來代管採客戶持有帳號與帳單，再授權代管者。[代管方式比較](docs/cloud-deployment-research.md#客戶持有帳號與帳單的代管方式) 說明三者的成員權限、跨客戶管理與費用影響；目前比較已計入 Render 多人管理需要的 Pro 工作區費用。
 

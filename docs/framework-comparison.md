@@ -2,29 +2,31 @@
 
 查證日期：2026-11-03。狀態為官方文件研究完成第一輪，尚未固定可重現的套件版本、建立原型或驗證真實 API。以下順位是依需求提出的研究判斷，不是測試排名或正式採用決定。
 
-部署比較安排更新日期：2026-11-06。下一輪把框架與部署組合一起驗證，加入 Cloudflare 路線，原有 13 個框架仍全部保留研究紀錄。
+部署比較安排更新日期：2026-11-09。下一輪把框架、部署組合與跨平台搬移一起驗證，原有 13 個框架仍全部保留研究紀錄。
 
-使用者已確認以部署簡單為優先，並由客戶持有雲端帳號與帳單，再授權代管。目前推薦 TypeScript、Cloudflare Workers、Vercel AI SDK、Workflows 與 D1 作第一個原型，Cloud Run 加 LangGraph 與 Postgres 作備案，Render 加 Pydantic AI 保留比較。這是研究建議，並非實測排名或正式採用決定。
+使用者已確認部署簡單、客戶持有帳號與帳單並授權代管，也要求納入未來搬到不同平台的彈性。目前先驗證 TypeScript、Node.js、LangGraph 核心套件、Postgres 與 Docker，在 Render 部署後搬到 Cloud Run；Cloudflare 加 Workflows、D1 移出第一順位並保留對照。這是研究建議，並非實測排名或正式採用決定。
 
 ## 目前判斷
 
-先以 Cloudflare 原型驗證 LINE 收文件、律師確認、Drive 歸檔與 LINE 通知。Vercel AI SDK 負責模型與工具，Workflows 負責背景流程與主要恢復，D1 保存案件、操作及記憶。若需要完整 Python、原生工具或更適合 GCP 的資料區域與網路條件，再驗證 Cloud Run 備案。[元件分工與切換條件](cloud-deployment-research.md#目前建議的第一個原型)
+先以同一套容器程式驗證 LINE 收文件、律師確認、Drive 歸檔與 LINE 通知，再搬移資料及未完成工作。兩平台固定語言、圖、模型工具與套件版本，平台差異只留在入口、派送、排程、網路與授權串接。[元件分工](cloud-deployment-research.md#目前建議的第一個原型) 與 [搬移成本及 Cloudflare 重新評估](deployment-portability-research.md) 記錄待驗證項目。
 
 三種工作方式與全部 13 個框架研究繼續保留。OpenAI Agents SDK 依模型與語言前提保留作工具層對照。
 
-這個安排保留不同設計的對照，不預設模型、開發語言或雲端供應商。TypeScript 路線已納入第一組驗證；若選 .NET 或已有 Azure 基礎，Microsoft Agent Framework 應提高順位。目前尚未確認這些偏好，因此不以「團隊不熟」排除任何選項。
+TypeScript 是本輪控制搬移差異的研究選擇，不代表使用者已指定正式語言。若選 .NET 或已有 Azure 基礎，Microsoft Agent Framework 應提高順位；其他語言與模型仍保留比較，不以「團隊不熟」排除任何選項。
 
 選型的核心是案件與權限、跨日確認、來源失效、重啟恢復及雲端維護。規劃、Shell、子代理、Skills 可以按需加入，不以功能數量相加決勝。
 
 ## 統一比較方式
 
-每個選項都對照 [15 項功能與 12 項故障情境](requirements-and-acceptance.md)。來源分為官方文件確認、原始碼確認、設計推論與待實測。各分題可能使用查證日 `main` 或滾動文件，正式驗證前須固定發布版本及相容套件，不能把文件現況視為穩定套件功能保證。
+每個選項都對照 [R01 至 R15 功能、F01 至 F12 故障與 M01 至 M08 搬移驗收](requirements-and-acceptance.md)。來源分為官方文件確認、原始碼確認、設計推論與待實測。各分題可能使用查證日 `main` 或滾動文件，正式驗證前須固定發布版本及相容套件，不能把文件現況視為穩定套件功能保證。
 
 本案所有選項都需要 LINE 驗簽及事件保存、Google OAuth、案件資料庫、通知規則、外部操作紀錄與定時啟動方式。Session、checkpoint、記憶、排程及外部操作防重複是不同能力，不能互相代替。
 
 比較先檢查能否合理完成必要行為，再看補足工作、維護負擔、模型替換、資料保存與成本。沒有實測資料時不評出虛構的效能、工時或費用分數。
 
 縮選單位是框架加完整部署組合。每個候選須說明 LINE 入口、執行環境、資料庫、排程、Google 授權及主要恢復方式。套件相容性待驗時明列缺口，正式採用前通過雲端部署驗證，不能只依模型呼叫或本機範例成功決定。
+
+每個候選另提出不同供應商的搬移目標，盤點要替換的平台元件、資料轉換、未完成工作交接與回復方式。月費、一次性搬移成本及實測工時分開記錄，不以能匯出資料或能換模型宣稱部署可攜。
 
 ## 全部選項的取捨
 
@@ -57,9 +59,9 @@
 
 | 路線 | 優先原型 | 要回答的問題 | 何時改換候選 |
 | --- | --- | --- | --- |
-| 明確案件工作流 | Cloud Run、LangGraph、持久 Postgres checkpointer，配 Cloud Tasks 與 Cloud Scheduler。 | 等律師確認、原文收回、重啟與重複回覆是否容易正確表達及驗收？請求生命週期能否配合恢復？ | 若只有少量固定呼叫，圖與 checkpoint 是否增加維護工作？.NET 或 Azure 條件成立時與 Microsoft 路線重比。 |
+| 明確案件工作流 | 第一順位：TypeScript、Node.js、LangGraph 核心、Postgres 與 Docker，先 Render，再 Cloud Run。 | 同一個圖與 checkpoint 能否隨資料搬移？派送與排程串接能否配合請求生命週期，通過 R、F、M 案例？ | 若圖與 checkpoint 增加的維護成本高於收益，與較簡單的業務狀態做法重比；不預設再疊加 AI SDK。 |
 | 業務後端加模型工具層 | Render 付費 Web Service、Background Worker、Postgres、Cron 與 Pydantic AI 核心。 | 不依賴完整自主 Agent，能否完成相同 R、F 案例？工作表與持久業務狀態能否處理中斷？ | 若以 OpenAI 為主要供應商，與 Agents SDK 的 RunState 組合比較，再選其一深入。 |
-| TypeScript 工具與持久背景工作 | Cloudflare Workers、Vercel AI SDK、Workflows、Cron 與一套持久資料庫。 | 套件、確認、重啟與 Google 工具是否相容？D1 或 Postgres 哪個能支援案件及操作資料？ | 若執行環境不合，與託管容器方案重比，不因平台偏好直接淘汰框架。 |
+| TypeScript 工具與持久背景工作 | Cloudflare Workers、Vercel AI SDK、Workflows 與 D1 或外部 Postgres，保留對照。 | 託管流程的便利能否抵銷搬移執行環境、資料及未完成工作的成本？ | M01 至 M08 與總維護負擔有證據支持時再提高順位；AI SDK 也可另在 Node.js 容器比較。 |
 
 這是下一輪驗證路線，不是已縮選完畢的三個正式候選。需要測試帳號才能確認的前提尚未通過，因此研究計畫的最終縮選項目仍保持未完成。
 
@@ -67,7 +69,7 @@ Microsoft、ADK、Strands 與各完整 Agent 都有合理採用條件，未進�
 
 ## 雲端方向與資料控制
 
-先比較 Cloudflare Workers 與 Workflows、Cloud Run 分段工作，以及 Render 付費容器與背景工作。各組合保留相同業務工具與驗收資料，框架專屬託管服務作另一組對照，詳見 [雲端部署研究](cloud-deployment-research.md)。不在這輪指定正式供應商。
+先比較 Render 與 Cloud Run 執行同一套 LangGraph 容器與 Postgres 的方式，再對照 Cloudflare Workers 與 Workflows。各組合保留相同業務工具與驗收資料，詳見 [雲端部署研究](cloud-deployment-research.md)。不在這輪指定正式供應商。
 
 Cloudflare 作為部署平台，與原有 13 個框架分開記錄能力。採用 Workers 時需核對套件與儲存適配，LangGraph 也可研究 TypeScript；Python 與 CLI 路線必要時另比較容器。Cloudflare Agents SDK、Durable Objects 與 Workflows 的分工按需求決定，不先疊加多套恢復機制。
 
@@ -84,5 +86,6 @@ LINE 的 PDF 限制、群組收件人計費、事件及身分規則已整理於 
 4. 同一條流程保存待確認內容，停止程序，再由另一個實例恢復。拒絕舊內容、過期及他人確認。
 5. 在外部成功而結果尚未保存時中斷，核對 Calendar 與 LINE 各自的去重及未知結果規則。
 6. 比較同一組合成案件的成功率、操作錯誤、模型用量、平台用量與實際部署步驟。
+7. 在第二個供應商部署相同程式，搬移到獨立資料庫並交接未完成任務，保存 M01 至 M08、一次性費用與實測工時。Cloudflare 不先假設能匯出內部流程歷史供其他引擎直接接續。
 
 所有模型與實際 API 測試目前均未執行。[部署比較摘要](cloud-deployment-research.md#三種部署方案比較摘要) 已使用明確的初期用量與計價基準試算月費，實際案件量、附件量、模型與部署區域仍待確定。不以假設試算宣稱某框架最快或最適合上線。
