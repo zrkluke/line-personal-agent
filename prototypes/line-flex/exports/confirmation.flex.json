@@ -1,0 +1,86 @@
+{
+  "type": "flex",
+  "altText": "模擬歸檔確認・範例客戶甲｜侵權行為",
+  "contents": {
+    "type": "bubble",
+    "size": "mega",
+    "body": {
+      "type": "box",
+      "layout": "vertical",
+      "spacing": "md",
+      "contents": [
+        {
+          "type": "text",
+          "text": "合成資料・僅模擬歸檔",
+          "wrap": true,
+          "size": "xs",
+          "color": "#666666"
+        },
+        {
+          "type": "text",
+          "text": "歸檔確認",
+          "wrap": true,
+          "size": "lg",
+          "weight": "bold",
+          "color": "#087F46"
+        },
+        {
+          "type": "text",
+          "text": "範例客戶甲｜侵權行為",
+          "wrap": true,
+          "size": "sm",
+          "weight": "bold"
+        },
+        {
+          "type": "text",
+          "text": "補充資料.pdf",
+          "wrap": true,
+          "size": "sm"
+        },
+        {
+          "type": "text",
+          "text": "範例時間 09:20・4 頁",
+          "wrap": true,
+          "size": "xs"
+        },
+        {
+          "type": "text",
+          "text": "信件主旨與已登記案由一致。",
+          "wrap": true,
+          "size": "xs",
+          "color": "#666666"
+        },
+        {
+          "type": "button",
+          "style": "primary",
+          "height": "sm",
+          "action": {
+            "type": "postback",
+            "label": "確認模擬歸檔",
+            "data": "synthetic_action_0000000000000004"
+          }
+        },
+        {
+          "type": "button",
+          "style": "secondary",
+          "height": "sm",
+          "action": {
+            "type": "postback",
+            "label": "改選案件",
+            "data": "synthetic_action_0000000000000005"
+          }
+        },
+        {
+          "type": "button",
+          "style": "secondary",
+          "height": "sm",
+          "action": {
+            "type": "postback",
+            "label": "查看來源",
+            "data": "synthetic_action_0000000000000006"
+          }
+        }
+      ]
+    }
+  }
+}
