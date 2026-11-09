@@ -8,6 +8,12 @@
 
 第一輪成果可先看 [13 個框架比較](docs/framework-comparison.md)，再看 [LINE API 限制](docs/line-api-research.md)、[Google 授權](docs/google-integration-research.md)、[需求與驗收](docs/requirements-and-acceptance.md) 及 [雲端部署](docs/cloud-deployment-research.md)。目前完成文件研究，原型與實際 API 驗證尚未執行。
 
+下一輪以「框架加完整部署組合」一起比較，納入 Cloudflare、Cloud Run 與 Render。每個候選都要說明 LINE 入口、背景工作、資料庫、排程、授權及恢復方式，正式採用前通過 [雲端部署驗證](docs/cloud-deployment-research.md#候選必須提出的部署證據)。目前尚未完成這些實測。
+
+[三種部署方案比較摘要](docs/cloud-deployment-research.md#三種部署方案比較摘要) 已記錄相同初期用量下的月費、部署難度與暫定建議。目前暫推薦 Cloudflare Workers、TypeScript、Vercel AI SDK、Workflows 與 D1 作第一個原型，Cloud Run 加 LangGraph 與 Postgres 作備案。[元件分工與切換條件](docs/cloud-deployment-research.md#目前建議的第一個原型) 已保存，尚未實作或正式定案。
+
+未來代管採客戶持有帳號與帳單，再授權代管者。[代管方式比較](docs/cloud-deployment-research.md#客戶持有帳號與帳單的代管方式) 說明三者的成員權限、跨客戶管理與費用影響；目前比較已計入 Render 多人管理需要的 Pro 工作區費用。
+
 Google 個人帳號與 Workspace 都納入研究、選型與支援規劃。本輪先用個人帳號實測；Workspace 因目前無法提供測試環境，保留相容性研究與後續實測項目，不以個人帳號結果宣稱 Workspace 已驗證。
 
 實際串接前請依 [LINE 與 Google 測試環境設定](docs/test-environment-setup.md) 準備帳號、雲端網址與憑證。公開 repo 只保存 [空白設定範本](.env.example)；實際密鑰與私人資料依 `.gitignore` 排除，雲端改由秘密管理服務提供。
